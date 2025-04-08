@@ -1,5 +1,5 @@
 import { Button, Modal, notification } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 function App() {
 
@@ -7,12 +7,17 @@ function App() {
   const renderRef = useRef<any>(null);
   const timer = useRef<any>(null);
 
+  const [value, setValue] = useState(0)
+
+  /**
+   * 处理电子秤数据
+
   /**
     * 连接电子秤
     */
   const onConnect = async () => {
     const serialJsonData = {
-      baudRate: 9600,
+      baudRate: 115200,
       dataBits: 8,
       flowControl: 'none',
       parity: 'none',
@@ -58,12 +63,25 @@ function App() {
    */
   const handleDeal = (value: any) => {
     try {
-      const hx = Array.prototype.map.call(value, x => ('00' + x.toString(16)).slice(-2)).join('');
-      console.log("电子秤数据:", value)
-      console.log("hx:", hx);
-      const decoder = new TextDecoder('utf-8');
-      const stringStr = decoder.decode(value);
-      console.log("stringStr", stringStr);
+      const hx = Array.prototype.map.call(
+        value,
+        x => ('00' + x.toString(16)).slice(-2)
+      ).join('');
+      if (hx.length === 30 &&
+        hx.substring(0, 2).toUpperCase() === 'AA' &&
+        hx.substring(28, 30).toUpperCase() === '2F') {
+        const hxWeight = hx.substring(10, 18);
+        const unit = hx.substring(6, 8);
+        const result = parseInt(hxWeight, 16);
+        setValue(result);
+        console.log("hxWeight:", result);
+      }
+      // const hx = Array.prototype.map.call(value, x => ('00' + x.toString(16)).slice(-2)).join('');
+      // console.log("电子秤数据:", value)
+      // console.log("hx:", hx);
+      // const decoder = new TextDecoder('utf-8');
+      // const stringStr = decoder.decode(value);
+      // console.log("stringStr", stringStr);
     } catch (error) {
       console.log("串口数据处理失败：", error)
     }
@@ -72,6 +90,7 @@ function App() {
   return (
     <div className="App">
       <Button onClick={onConnect}>连接设备</Button>
+      <h1>{value}</h1>
     </div>
   );
 }

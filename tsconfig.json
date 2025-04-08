@@ -3,7 +3,8 @@
     "strict": false,
     "declaration": false,
     "skipLibCheck": false,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
